@@ -36,7 +36,7 @@ typedef struct 		t_room
 
 typedef struct		t_map
 {
-	int				ant;
+	unsigned long	ant;
 	s_room			*allroom;
 }					s_map;
 
