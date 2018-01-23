@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/omakovsk/Documents/Lem_in/libft/libft.h
+string.h
+-
+stdlib.h
+-
+unistd.h
+-
+
+/Users/omakovsk/Documents/Lem_in/src/lem_in.h
+stdio.h
+-
+../libft/libft.h
+/Users/omakovsk/Documents/Lem_in/libft/libft.h
+fcntl.h
+-
+
+/Users/omakovsk/Documents/Lem_in/src/lemin.c
+lem_in.h
+/Users/omakovsk/Documents/Lem_in/src/lem_in.h
+
