@@ -18,6 +18,27 @@
 #include "../libft/libft.h"
 #include <fcntl.h>
 
+typedef struct		t_rezult
+{
+	char 			*predecessor;
+	char 			*name;
+	struct t_rezult	*next;
+}					s_rezult;
+
+typedef struct		t_qeueu
+{
+	char 			*predecessor;
+	char 			*name;
+	struct t_qeueu	*next;
+}					s_qeueu;
+
+typedef struct		t_used
+{
+	char 			*predecessor;
+	char 			*name;
+	struct t_used	*next;
+}					s_used;
+
 typedef struct		t_nbr
 {
 	char			*name;
