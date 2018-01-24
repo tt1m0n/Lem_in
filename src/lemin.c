@@ -169,7 +169,7 @@ int		check_line(char *line, s_check *check)
 	 (line[0] == '#' && line[1] == '#' && line[2] == '#'))
 		return (3);
 	if (line[0] == '\0' || line[0] == ' ')
-		return (1); // 1
+		return (0);
 	return (check_bad_line(line));
 }
 
@@ -438,23 +438,6 @@ char	*search_flag(s_map *head, int flag)
 	return (NULL);
 }
 
-/*
-int 	count_room(s_map *head)
-{
-	int	i;
-	s_room *tmp;
-
-	i = 0;
-	tmp = head->allroom;
-	while (tmp != NULL)
-	{
-		i++;
-		tmp = tmp->nextroom;
-	}
-	return (i);
-}
-*/
-
 void	stack_push(s_qeueu **stack, char *str, char *predecessor)
 {
 	s_qeueu *new;
@@ -538,19 +521,7 @@ int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used)
 	}
 	return (1);
 }
-
 /*
-void	print_stack(s_qeueu *stack)
-{
-	while (stack != NULL)
-	{
-		printf ("s->name == %s -> ", stack->name);
-		stack = stack->next;
-	}
-	printf ("\n\n");
-}*/
-
-
 void	print_used(s_used *stack)
 {
 	s_used *tmp;
@@ -562,7 +533,7 @@ void	print_used(s_used *stack)
 		tmp = tmp->next;
 	}
 	printf ("END\n");
-}
+}*/
 
 void	search_add_end(s_used *used, s_rezult **rez, char *end)
 {
@@ -623,7 +594,7 @@ int		add_rezult(s_rezult **rez, s_used *used, char *end)
 		return (0);
 	return (1);
 }
-
+/*
 void	print_rez(s_rezult *rez)
 {
 	while (rez != NULL)
@@ -631,7 +602,7 @@ void	print_rez(s_rezult *rez)
 		printf ("(%s) -> ", rez->name);
 		rez = rez->next;
 	}
-}
+} */
 
 int		start_alg(char *start, char *end, s_map *head, s_rezult **rez)
 {
@@ -653,24 +624,63 @@ int		start_alg(char *start, char *end, s_map *head, s_rezult **rez)
 		}
 		add_front_used(&used, stack);
 		pop_first_stack(&stack);
-	//	print_used(used);
 	}
 	while (add_rezult(rez, used, end))
 		;
-	print_rez(*rez);
+	//print_rez(*rez);
 	return (1);
+}
+
+void 	null_rez_array(s_rezult ***rez, int num)
+{
+	int i;
+
+	i = 0;
+	while (i < num)
+		*rez[i++] = NULL;
+}
+
+int 	search_st_nbr(s_map *head, char *start)
+{
+	s_room	*tmp;
+	s_nbr	*tmpnbr;
+	int		i;
+
+	tmpnbr = NULL;
+	tmp = head->allroom;
+	i = 0;
+	while (tmp != NULL)
+	{
+		if (ft_strcmp(tmp->name, start) == 0)
+		{
+			tmpnbr = tmp->headnbr;
+			while (tmpnbr != NULL)
+			{
+				i++;
+				tmpnbr = tmpnbr->nextnbr;
+			}
+			printf ("rez = %d\n", i);
+			return (i);
+		}
+		tmp = tmp->nextroom;
+	}
+	return (0);
 }
 
 int 	main_alg(s_map *head)
 {
 	char *start;
 	char *end;
-	s_rezult *rez;
+	s_rezult **rez;
+	int		numnbr_start;
 
 	start = search_flag(head, 1);
 	end = search_flag(head, 2);
-	rez = NULL;
-	start_alg(start, end, head, &rez);
+	numnbr_start = search_st_nbr(head, start);
+	rez = (s_rezult**)malloc(sizeof(s_rezult*) * numnbr_start);
+	null_rez_array(&rez, numnbr_start);
+	start_alg(start, end, head, rez);
+	//not start, and not nbr of start
 	return (1);
 }
 
@@ -692,16 +702,15 @@ int		read_map(int fd, s_map *head)
 	while (ft_get_next_line(fd, &line) > 0)
 	{
 		if (check_line(line, &check) == 1)
-		{
 			if (write_room(fd, &line, head, &check) == 0)
 				return (0);
-		}
-		else if (check_line(line, &check) == 2)
-		{
+		if (check_line(line, &check) == 2)
 			write_pipe(line, head, &check);
+		if (check_line(line, &check) == 0)
+		{
+			free(line);
+			break;
 		}
-		else if (check_line(line, &check) == 0)
-			break ;
 		free(line);
 	}
 	if (check_after_read(check) == 0)
@@ -710,6 +719,42 @@ int		read_map(int fd, s_map *head)
 //			check.count_st_sharp, check.count_end_sharp, check.count_st_path,
 //			check.count_end_path);
 	return (1);
+}
+
+void	print_head (s_map head)
+{
+	s_room *tmp;
+
+	tmp = head.allroom;
+	while (tmp != NULL)
+	{
+		printf ("(%s)-> ", tmp->name);
+		tmp = tmp->nextroom;
+	}
+}
+
+void	start_first(s_map *head)
+{
+	s_room	*tmp;
+	s_room	*prev;
+
+	prev = head->allroom;
+	tmp = head->allroom->nextroom;
+	printf ("prev->name %s\n", prev->name);
+	printf ("prev->flag %d\n", prev->flag);
+	if (prev->flag == 1)
+		return ;
+	while (tmp != NULL)
+	{
+		if (tmp->flag == 1)
+		{
+			prev->nextroom = tmp->nextroom;
+			tmp->nextroom = head->allroom;
+			head->allroom = tmp;
+		}
+		tmp = tmp->nextroom;
+		prev = prev->nextroom;
+	}
 }
 
 int		main (int argc, char **argv)
@@ -726,6 +771,10 @@ int		main (int argc, char **argv)
 			free_all_map(&head);
 			return (0);
 		}
+		print_head(head);
+		start_first(&head);
+		printf ("\n");
+		print_head(head);
 		main_alg(&head);
 		free_all_map(&head);
 		close (fd);
