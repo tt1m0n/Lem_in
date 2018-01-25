@@ -459,29 +459,18 @@ void	stack_push(s_qeueu **stack, char *str, char *predecessor)
 	tmp->next = new;
 }
 
-s_nbr	*search_room(s_map *head, char *name)
-{
-	s_room	*tmp;
-
-	tmp = head->allroom;
-	while (tmp != NULL)
-	{
-		if (ft_strcmp(name, tmp->name) == 0)
-			return (tmp->headnbr);
-		tmp = tmp->nextroom;
-	}
-	return (NULL);
-}
-
-void	pop_first_stack(s_qeueu **stack)
+void		pop_first_stack(s_qeueu **stack)
 {
 	s_qeueu *del;
 
 	del = (*stack);
 	(*stack) = (*stack)->next;
 	free(del->predecessor);
+	del->predecessor = NULL;
 	free(del->name);
+	del->name = NULL;
 	free(del);
+	del = NULL;
 }
 
 void	add_front_used(s_used **used, s_qeueu *stack)
@@ -500,61 +489,6 @@ void	add_front_used(s_used **used, s_qeueu *stack)
 	}
 	new->next = (*used);
 	(*used) = new;
-}
-
-int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used)
-{
-	while (stack != NULL)
-	{
-		if (ft_strcmp(stack->name, tmpnbr->name) == 0)
-		{
-			return (0);
-		}
-		stack = stack->next;
-	}
-	while (used != NULL)
-	{
-		if (ft_strcmp(used->name, tmpnbr->name) == 0) {
-			return (0);
-		}
-		used = used->next;
-	}
-	return (1);
-}
-/*
-void	print_used(s_used *stack)
-{
-	s_used *tmp;
-
-	tmp = stack;
-	while (tmp != NULL)
-	{
-		printf ("%s(%s) -> ", tmp->name, tmp->predecessor);
-		tmp = tmp->next;
-	}
-	printf ("END\n");
-}*/
-
-void	search_add_end(s_used *used, s_rezult **rez, char *end)
-{
-	s_rezult	*new;
-	s_used		*tmpused;
-
-	tmpused = used;
-	if (!(new = (s_rezult*)malloc(sizeof(s_rezult))))
-		return ;
-	new->next = NULL;
-	while(tmpused != NULL)
-	{
-		if (ft_strcmp(tmpused->name, end) == 0)
-		{
-			new->name = ft_strdup(end);
-			new->predecessor = ft_strdup(tmpused->predecessor);
-			(*rez) = new;
-			return ;
-		}
-		tmpused = tmpused->next;
-	}
 }
 
 void		search_add_predecessor(s_used *used, s_rezult **rez)
@@ -579,6 +513,121 @@ void		search_add_predecessor(s_used *used, s_rezult **rez)
 	}
 }
 
+void 	null_rez_array(s_rezult ***rez, int num)
+{
+	int i;
+
+	i = 0;
+	while (i < num)
+	{
+		(*rez)[i] = NULL;
+		i++;
+	}	
+}
+
+int 	search_st_nbr(s_map *head)
+{
+	s_nbr	*tmpnbr;
+	int		i;
+
+	tmpnbr = head->allroom->headnbr;
+	i = 0;
+	while (tmpnbr != NULL)
+	{
+		i++;
+		tmpnbr = tmpnbr->nextnbr;
+	}
+	return (i);
+}
+
+/* used when search start room in all rooms
+s_nbr	*search_room(s_map *head, char *name)
+{
+	s_room	*tmp;
+
+	tmp = head->allroom;
+	while (tmp != NULL)
+	{
+		if (ft_strcmp(name, tmp->name) == 0)
+			return (tmp->headnbr);
+		tmp = tmp->nextroom;
+	}
+	return (NULL);
+}*/
+
+int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used, s_map *head)
+{
+	s_nbr	*startnbr;
+
+	startnbr = head->allroom->headnbr;
+	while (stack != NULL)
+	{
+		if (ft_strcmp(stack->name, tmpnbr->name) == 0)
+			return (0);
+		stack = stack->next;
+	}
+	while (startnbr != NULL)
+	{
+		if (ft_strcmp(startnbr->name, tmpnbr->name) == 0)
+			return (0);
+		startnbr = startnbr->nextnbr;
+	}
+	while (used != NULL)
+	{
+		if (ft_strcmp(used->name, tmpnbr->name) == 0)
+			return (0);
+		used = used->next;
+	}
+	if (ft_strcmp(head->allroom->name, tmpnbr->name) == 0)
+		return (0);
+	return (1);
+}
+
+void	print_used(s_used *used)
+{
+	while (used != NULL)
+	{
+		printf ("%s(%s) ->", used->name, used->predecessor);
+		used = used->next;
+	}
+}
+
+void	search_add_end(s_used *used, s_rezult **rez, char *end)
+{
+	s_rezult	*new;
+	s_used		*tmpused;
+
+	tmpused = used;
+	if (!(new = (s_rezult*)malloc(sizeof(s_rezult))))
+		return ;
+	new->next = NULL;
+	while(tmpused != NULL)
+	{
+		if (ft_strcmp(tmpused->name, end) == 0)
+		{
+			new->name = ft_strdup(end);
+			new->predecessor = ft_strdup(tmpused->predecessor);
+			(*rez) = new;
+			return ;
+		}
+		tmpused = tmpused->next;
+	}
+}
+
+s_nbr	*search_room(s_map *head, char *name)
+{
+	s_room	*tmp;
+
+	tmp = head->allroom;
+	while (tmp != NULL)
+	{
+		if (ft_strcmp(name, tmp->name) == 0)
+			return (tmp->headnbr);
+		tmp = tmp->nextroom;
+	}
+	return (NULL);
+}
+
 int		add_rezult(s_rezult **rez, s_used *used, char *end)
 {
 	s_rezult	*tmp;
@@ -594,17 +643,26 @@ int		add_rezult(s_rezult **rez, s_used *used, char *end)
 		return (0);
 	return (1);
 }
-/*
-void	print_rez(s_rezult *rez)
-{
-	while (rez != NULL)
-	{
-		printf ("(%s) -> ", rez->name);
-		rez = rez->next;
-	}
-} */
 
-int		start_alg(char *start, char *end, s_map *head, s_rezult **rez)
+void	print_stack(s_qeueu *stack)
+{
+	while (stack != NULL)
+	{
+		printf ("%s ->", stack->name);
+		stack = stack->next;
+	}
+}
+
+void	print_rez(s_rezult **rez)
+{
+	while ((*rez) != NULL)
+	{
+		printf ("%s ->", (*rez)->name);
+		(*rez) = (*rez)->next;
+	}
+}
+
+int		start_alg(char *end, s_room *start, s_rezult **rez, s_map *head)
 {
 	s_qeueu *stack;
 	s_nbr	*tmpnbr;
@@ -612,13 +670,13 @@ int		start_alg(char *start, char *end, s_map *head, s_rezult **rez)
 
 	stack = NULL;
 	used = NULL;
-	stack_push(&stack, start, start);
+	stack_push(&stack, start->name, start->name);
 	while (stack)
 	{
 		tmpnbr = search_room(head, stack->name);
 		while (tmpnbr != NULL)
 		{
-			if (check_stack_used(tmpnbr, stack, used) == 1)
+			if (check_stack_used(tmpnbr, stack, used, head) == 1)
 				stack_push(&stack, tmpnbr->name, stack->name);
 			tmpnbr = tmpnbr->nextnbr;
 		}
@@ -627,60 +685,50 @@ int		start_alg(char *start, char *end, s_map *head, s_rezult **rez)
 	}
 	while (add_rezult(rez, used, end))
 		;
-	//print_rez(*rez);
+	print_rez(rez);
+	printf("\n");
 	return (1);
 }
 
-void 	null_rez_array(s_rezult ***rez, int num)
+void	alg_each_nbr(char *end, s_map *head, s_rezult **rez, int num)
 {
-	int i;
-
-	i = 0;
-	while (i < num)
-		*rez[i++] = NULL;
-}
-
-int 	search_st_nbr(s_map *head, char *start)
-{
-	s_room	*tmp;
-	s_nbr	*tmpnbr;
 	int		i;
+	s_nbr	*tmp;
+	s_room	*tmproom;
 
-	tmpnbr = NULL;
-	tmp = head->allroom;
 	i = 0;
-	while (tmp != NULL)
+	tmp = head->allroom->headnbr;
+	tmproom = head->allroom;
+	while (i < num)
 	{
-		if (ft_strcmp(tmp->name, start) == 0)
-		{
-			tmpnbr = tmp->headnbr;
-			while (tmpnbr != NULL)
-			{
-				i++;
-				tmpnbr = tmpnbr->nextnbr;
-			}
-			printf ("rez = %d\n", i);
-			return (i);
-		}
-		tmp = tmp->nextroom;
+		tmp = tmp->nextnbr;
+		i++;
 	}
-	return (0);
+	while (tmproom != NULL)
+	{
+		if (strcmp(tmproom->name, tmp->name) == 0)
+			start_alg(end, tmproom, rez, head);
+		tmproom = tmproom->nextroom;
+	}
 }
 
 int 	main_alg(s_map *head)
 {
-	char *start;
-	char *end;
+	char	*end;
 	s_rezult **rez;
 	int		numnbr_start;
+	int i;
 
-	start = search_flag(head, 1);
-	end = search_flag(head, 2);
-	numnbr_start = search_st_nbr(head, start);
+	i = 0;
+	numnbr_start = search_st_nbr(head);
 	rez = (s_rezult**)malloc(sizeof(s_rezult*) * numnbr_start);
 	null_rez_array(&rez, numnbr_start);
-	start_alg(start, end, head, rez);
-	//not start, and not nbr of start
+	end = search_flag(head, 2);
+	while (i < numnbr_start)
+	{
+		alg_each_nbr(end, head, &rez[i], i);
+		i++;
+	}
 	return (1);
 }
 
@@ -720,7 +768,7 @@ int		read_map(int fd, s_map *head)
 //			check.count_end_path);
 	return (1);
 }
-
+/*
 void	print_head (s_map head)
 {
 	s_room *tmp;
@@ -731,7 +779,7 @@ void	print_head (s_map head)
 		printf ("(%s)-> ", tmp->name);
 		tmp = tmp->nextroom;
 	}
-}
+} */
 
 void	start_first(s_map *head)
 {
@@ -740,8 +788,6 @@ void	start_first(s_map *head)
 
 	prev = head->allroom;
 	tmp = head->allroom->nextroom;
-	printf ("prev->name %s\n", prev->name);
-	printf ("prev->flag %d\n", prev->flag);
 	if (prev->flag == 1)
 		return ;
 	while (tmp != NULL)
@@ -751,6 +797,7 @@ void	start_first(s_map *head)
 			prev->nextroom = tmp->nextroom;
 			tmp->nextroom = head->allroom;
 			head->allroom = tmp;
+			return ;
 		}
 		tmp = tmp->nextroom;
 		prev = prev->nextroom;
@@ -771,10 +818,7 @@ int		main (int argc, char **argv)
 			free_all_map(&head);
 			return (0);
 		}
-		print_head(head);
 		start_first(&head);
-		printf ("\n");
-		print_head(head);
 		main_alg(&head);
 		free_all_map(&head);
 		close (fd);
