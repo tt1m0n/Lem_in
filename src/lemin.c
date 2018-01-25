@@ -62,16 +62,12 @@ int 	check_space(char **split)
 
 	i = 0;
 	while (split[0][i])
-	{
 		if (split[0][i++] == ' ')
 			return (0);
-	}
 	i = 0;
 	while (split[1][i])
-	{
 		if (split[1][i++] == ' ')
 			return (0);
-	}
 	return (1);
 }
 
@@ -147,10 +143,10 @@ int		check_bad_line(char *line)
 	{
 		if (check_pipe(line))
 			return (2);
-		return (0); //1
+		return (0);
 	}
 	if (count > 1)
-		return (0); //1
+		return (0);
 	return(check_room(line));
 }
 
@@ -161,7 +157,8 @@ int		check_line(char *line, s_check *check)
 		check->count_st_sharp++;
 		return (1);
 	}
-	if (strncmp(line, "##end", 6) == 0) {
+	if (strncmp(line, "##end", 6) == 0) 
+	{
 		check->count_end_sharp++;
 		return (1);
 	}
@@ -205,7 +202,8 @@ void	extract_name_room(char *line, s_room **new_room)
 	free(split);
 }
 
-void	extract_coord(char *line, s_room **new_room) {
+void	extract_coord(char *line, s_room **new_room) 
+{
 	char **split;
 
 	split = ft_strsplit(line, ' ');
@@ -257,7 +255,7 @@ int		check_add_room(char *line, s_map *head, int flag)
 	init_newroom(line, &new_room, flag);
 	if (check_new_room(&new_room, head->allroom) == 0)
 		return (0);
-	printf ("list == %s x == %d y == %d\n", new_room->name, new_room->x, new_room->y);
+	//printf ("list == %s x == %d y == %d\n", new_room->name, new_room->x, new_room->y);
 	if (head->allroom == NULL)
 	{
 		head->allroom = new_room;
@@ -269,6 +267,28 @@ int		check_add_room(char *line, s_map *head, int flag)
 	return (1);
 }
 
+int		startline_if(int fd, char **line, s_check *check, s_map *head)
+{
+	ft_get_next_line(fd, line);
+	if (check_line(*line, check) == 1)
+		if (check_add_room(*line, head, 1) == 0)
+			return (0);
+	if (check_line(*line, check) == 0)
+		return (0);
+	return (1);
+}
+
+int		endline_if(int fd, char **line, s_check *check, s_map *head)
+{
+	ft_get_next_line(fd, line);
+	if (check_line(*line, check) == 1)
+		if (check_add_room(*line, head, 2) == 0)
+			return (0);
+	if (check_line(*line, check) == 0)
+		return (0);
+	return (1);
+}
+
 int		write_room(int fd, char **line, s_map *head, s_check *check)
 {
 	char	*tmp;
@@ -277,21 +297,13 @@ int		write_room(int fd, char **line, s_map *head, s_check *check)
 	if (strncmp(*line, "##start", 8) == 0)
 	{
 		free(tmp);
-		ft_get_next_line(fd, line);
-		if (check_line(*line, check) == 1)
-			if (check_add_room(*line, head, 1) == 0)
-				return (0);
-		if (check_line(*line, check) == 0)
+		if (startline_if(fd, line, check, head) == 0)
 			return (0);
 	}
 	else if (strncmp(*line, "##end", 6) == 0)
 	{
 		free(tmp);
-		ft_get_next_line(fd, line);
-		if (check_line(*line, check) == 1)
-			if (check_add_room(*line, head, 2) == 0)
-				return (0);
-		if (check_line(*line, check) == 0)
+		if (endline_if(fd, line, check, head) == 0)
 			return (0);
 	}
 	else
@@ -416,8 +428,8 @@ void	free_all_map(s_map *map)
 	while (tmproom != NULL)
 	{
 		tmproom = tmproom->nextroom;
-		free(prevroom->name);
 		free_nbr(prevroom->headnbr);
+		free(prevroom->name);
 		prevroom = tmproom;
 	}
 }
@@ -518,7 +530,7 @@ void 	null_rez_array(s_rezult ***rez, int num)
 	int i;
 
 	i = 0;
-	while (i < num)
+	while (i <= num)
 	{
 		(*rez)[i] = NULL;
 		i++;
@@ -527,11 +539,11 @@ void 	null_rez_array(s_rezult ***rez, int num)
 
 int 	search_st_nbr(s_map *head)
 {
-	s_nbr	*tmpnbr;
 	int		i;
+	s_nbr	*tmpnbr;
 
-	tmpnbr = head->allroom->headnbr;
 	i = 0;
+	tmpnbr = head->allroom->headnbr;
 	while (tmpnbr != NULL)
 	{
 		i++;
@@ -539,21 +551,6 @@ int 	search_st_nbr(s_map *head)
 	}
 	return (i);
 }
-
-/* used when search start room in all rooms
-s_nbr	*search_room(s_map *head, char *name)
-{
-	s_room	*tmp;
-
-	tmp = head->allroom;
-	while (tmp != NULL)
-	{
-		if (ft_strcmp(name, tmp->name) == 0)
-			return (tmp->headnbr);
-		tmp = tmp->nextroom;
-	}
-	return (NULL);
-}*/
 
 int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used, s_map *head)
 {
@@ -581,15 +578,6 @@ int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used, s_map *head)
 	if (ft_strcmp(head->allroom->name, tmpnbr->name) == 0)
 		return (0);
 	return (1);
-}
-
-void	print_used(s_used *used)
-{
-	while (used != NULL)
-	{
-		printf ("%s(%s) ->", used->name, used->predecessor);
-		used = used->next;
-	}
 }
 
 void	search_add_end(s_used *used, s_rezult **rez, char *end)
@@ -636,29 +624,33 @@ int		add_rezult(s_rezult **rez, s_used *used, char *end)
 	if (tmp == NULL)
 	{
 		search_add_end(used, rez, end);
+		if (ft_strcmp((*rez)->name, (*rez)->predecessor) == 0)
+			return (0);
 		return (1);
 	}
-	search_add_predecessor(used, rez);
 	if (ft_strcmp((*rez)->name, (*rez)->predecessor) == 0)
 		return (0);
+	search_add_predecessor(used, rez);
 	return (1);
 }
 
-void	print_stack(s_qeueu *stack)
+void	free_used(s_used *used)
 {
-	while (stack != NULL)
-	{
-		printf ("%s ->", stack->name);
-		stack = stack->next;
-	}
-}
+	s_used	*tmp;
+	s_used	*prev;
 
-void	print_rez(s_rezult **rez)
-{
-	while ((*rez) != NULL)
+	prev = used;
+	tmp = used;
+	while (tmp != NULL)
 	{
-		printf ("%s ->", (*rez)->name);
-		(*rez) = (*rez)->next;
+		prev = tmp;
+		tmp = tmp->next;
+		free(prev->predecessor);
+		prev->predecessor = NULL;
+		free(prev->name);
+		prev->name = NULL;
+		free(prev);
+		prev = NULL;
 	}
 }
 
@@ -685,8 +677,7 @@ int		start_alg(char *end, s_room *start, s_rezult **rez, s_map *head)
 	}
 	while (add_rezult(rez, used, end))
 		;
-	print_rez(rez);
-	printf("\n");
+	free_used(used);
 	return (1);
 }
 
@@ -712,6 +703,140 @@ void	alg_each_nbr(char *end, s_map *head, s_rezult **rez, int num)
 	}
 }
 
+void	free_main_rez(s_rezult **rez)
+{
+	int i;
+	s_rezult *tmp;
+	s_rezult *prev;
+
+	i = 0;
+	while (rez[i] != NULL)
+	{
+		tmp = rez[i];
+		while (tmp != NULL)
+		{
+			prev = tmp;
+			tmp = tmp->next;
+			free(prev->predecessor);
+			prev->predecessor = NULL;
+			free(prev->name);
+			prev->name = NULL;
+			free(prev);
+			prev = NULL;
+		}
+		i++;
+	}
+}
+
+
+void	print_draft(s_rezult **rez)
+{
+	int i;
+	s_rezult *tmp;
+
+	i = 0;
+	while (rez[i] != NULL)
+	{
+		tmp = rez[i];
+		while (tmp != NULL)
+		{
+			printf ("(%s) ->", tmp->name);
+			tmp = tmp->next;
+		}
+		printf ("\n");
+		i++;
+	}
+}
+
+/*
+void	print_rezult(s_rezult **rez, char *end, int ant)
+{
+	int i;
+	int j;
+
+	i = 1;
+	j = 0;
+	while (i < ant)
+	{
+		while (rez[j] != NULL)
+		{
+			printf ("L%d-%s ", i, rez[j]->name);
+			rez = rez[j]->next;
+		}
+	}
+}*/
+
+int		len_rez(s_rezult *rez)
+{
+	int i;
+
+	i = 0;
+	while (rez != NULL)
+	{
+		rez = rez->next;
+		i++;
+	}
+	return (i);
+}
+
+void	swap_rez(s_rezult **rez, int i)
+{
+	s_rezult	*tmp;
+
+	tmp = rez[i];
+	rez[i] = rez[i - 1];
+	rez[i - 1] = tmp;
+}
+
+void	compare_rez(s_rezult **rez, int i)
+{
+	s_rezult *tmpnext;
+	s_rezult *tmpprev;
+	int 	j;
+
+	tmpnext = rez[i];
+	while (tmpnext->next != NULL)
+	{
+		j = 0;
+		while (i - j - 1 >= 0)
+		{
+			tmpprev = rez[i - j - 1];
+			while (tmpprev->next != NULL)
+			{
+				if (ft_strcmp(tmpnext->name, tmpprev->name) == 0)
+				{
+					free(tmpnext->name);
+					free(tmpnext->predecessor);
+					free(tmpnext);
+					rez[i] = rez[i + 1];
+					while (rez[i] != NULL)
+					{
+						rez[i] = rez[i + 1];
+						i++;
+					}
+				}
+				tmpprev = tmpprev->next;
+			}
+			j++;
+		}	
+		tmpnext = tmpnext->next;
+	}
+}
+
+void	del_cross_rez(s_rezult **rez)
+{
+	int i;
+	int j;
+
+	i = 0;
+	while (rez[i] != NULL)
+	{
+		if (i != 0)
+			compare_rez(rez, i);
+		i++;
+	}
+}
+
 int 	main_alg(s_map *head)
 {
 	char	*end;
@@ -721,18 +846,47 @@ int 	main_alg(s_map *head)
 
 	i = 0;
 	numnbr_start = search_st_nbr(head);
-	rez = (s_rezult**)malloc(sizeof(s_rezult*) * numnbr_start);
-	null_rez_array(&rez, numnbr_start);
+	rez = (s_rezult**)malloc(sizeof(s_rezult*) * (numnbr_start * 2 + 1));
+	null_rez_array(&rez, numnbr_start * 2 + 1);
 	end = search_flag(head, 2);
 	while (i < numnbr_start)
 	{
 		alg_each_nbr(end, head, &rez[i], i);
+		if (i != 0)
+			if (len_rez(rez[i]) < len_rez(rez[i - 1]))
+				swap_rez(rez, i);
 		i++;
 	}
+	del_cross_rez(rez);
+	print_draft(rez);
+//	print_rezult(rez, end, head->ant);
+	free_main_rez(rez);
+	free(rez);
 	return (1);
 }
 
 // --------------------------------- END ALGHORITM ---------------------------------
+
+int		read_cycle(int fd, s_check *check, s_map *head)
+{
+	char *line;
+
+	while (ft_get_next_line(fd, &line) > 0)
+	{
+		if (check_line(line, check) == 1)
+			if (write_room(fd, &line, head, check) == 0)
+				return (0);
+		if (check_line(line, check) == 2)
+			write_pipe(line, head, check);
+		if (check_line(line, check) == 0)
+		{
+			free(line);
+			break;
+		}
+		free(line);
+	}
+	return (1);
+}
 
 int		read_map(int fd, s_map *head)
 {
@@ -747,39 +901,12 @@ int		read_map(int fd, s_map *head)
 	if (!(write_ant(line, head)))
 		return (0);
 	free(line);
-	while (ft_get_next_line(fd, &line) > 0)
-	{
-		if (check_line(line, &check) == 1)
-			if (write_room(fd, &line, head, &check) == 0)
-				return (0);
-		if (check_line(line, &check) == 2)
-			write_pipe(line, head, &check);
-		if (check_line(line, &check) == 0)
-		{
-			free(line);
-			break;
-		}
-		free(line);
-	}
+	if (read_cycle(fd, &check, head) == 0)
+		return (0);
 	if (check_after_read(check) == 0)
 		return (0);
-//	printf ("st.sharp == %d\nend_sharp == %d\nst_path == %d\nend_path == %d\n",
-//			check.count_st_sharp, check.count_end_sharp, check.count_st_path,
-//			check.count_end_path);
 	return (1);
 }
-/*
-void	print_head (s_map head)
-{
-	s_room *tmp;
-
-	tmp = head.allroom;
-	while (tmp != NULL)
-	{
-		printf ("(%s)-> ", tmp->name);
-		tmp = tmp->nextroom;
-	}
-} */
 
 void	start_first(s_map *head)
 {
@@ -823,6 +950,6 @@ int		main (int argc, char **argv)
 		free_all_map(&head);
 		close (fd);
 	}
-//	system("leaks Lem_in");
+//	system("leaks lemin");
 	return (0);
 }
