@@ -778,7 +778,7 @@ void	print_draft(s_rezult **rez)
 			ft_printf ("(%s) ->", tmp->name);
 			tmp = tmp->next;
 		}
-		printf ("\n");
+		ft_printf ("\n");
 		i++;
 	}
 }
@@ -803,9 +803,13 @@ void	swap_rez(s_rezult **rez, int i)
 {
 	s_rezult	*tmp;
 
-	tmp = rez[i];
-	rez[i] = rez[i - 1];
-	rez[i - 1] = tmp;
+	while (i > 0)
+	{	
+		tmp = rez[i];
+		rez[i] = rez[i - 1];
+		rez[i - 1] = tmp;
+		i--;
+	}	
 }
 
 void	free_dublicat_rez(s_rezult **rez)
@@ -873,52 +877,88 @@ void	del_cross_rez(s_rezult **rez)
 	}
 }
 
-// ++++++++++++++++++++++++++ START PRINT REZULT START=================================
-/*
-void	init_print_ant(s_rezult **ant, s_rezult **rez, int count)
+int		count_rez(s_rezult **rez)
 {
 	int		i;
 
 	i = 0;
+	while (rez[i] != NULL)
+		i++;
+	return (i);
+}
+
+// ++++++++++++++++++++++++++ START PRINT REZULT START=================================
+
+void	init_print_ant(s_rezult **ant, s_rezult **rez, int count, int *ants_on_way)
+{
+	int		i;
+	int 	j;
+	int		stop[count_rez(rez)];
+
+	i = 0;
 	while (i < count)
 	{
+		j = 0;
+		while (rez[j] != NULL)
 		ant[i] = rez[0];
-		printf ("%d = (%s)\n", i, ant[i]->name);
-		i++;
+
 	}
 }
 
-void	print_rezult(s_rezult **rez, int ant)
+void	print_rezult(s_rezult **rez, int ant, int *ants_on_way)
 {
 	s_rezult *print_ant[ant];
-	init_print_ant(print_ant, rez, ant);
-} */
+	init_print_ant(print_ant, rez, ant, ants_on_way);
+}
 
 // ++++++++++++++++++++++++++ END PRINT REZULT END=================================
 
 
 // +++++++++++++++++++++++++START SEARCH BEST ++++++++++++++++++++++++++++++++
 
-int		count_rez(s_rezult **rez)
+int		count_middle(s_rezult **rez, int *time)
 {
-	s_rezult *tmp;
-	int		i;
+	int			i;
+	int			count;
 
 	i = 0;
-	tmp = (*rez);
-	while (tmp != NULL)
+	count = 0;
+	while (rez[i] != NULL)
 	{
-		tmp = tmp->next;
+		count = count + time[i];
 		i++;
 	}
-	return (i);
+	return (count);
 }
 
-void	search_best_ways(s_rezult **rez, int ant)
+int		*count_antway(s_rezult **rez, int *onway, int *time)
 {
-	int		num_of_ways;
+	int middle;
+	int i;
+	int num_rez;
+
+	i = 0;
+	num_rez = count_rez(rez);
+	middle = count_middle(rez, time);
+	while (rez[i] != NULL)
+	{
+		ft_printf("time == %d\n", time[i]);
+		if (i == 0)
+			onway[i] = time[i] + middle / num_rez + (middle % num_rez)
+			- time[i] - len_rez(rez[i]);
+		else
+			onway[i] = time[i] + middle / num_rez - time[i] - len_rez(rez[i]);
+		ft_printf("ants == %d\n", onway[i]);
+		i++;
+	}
+	return (onway);
+}
+
+int		*search_best_ways(s_rezult **rez, int ant)
+{
+	int		num_ways;
 	int		ants_on_way[count_rez(rez)];
-	int		time[count_rez(rez)]
+	int		time[count_rez(rez)];
 	int		i;
 
 	i = 0;
@@ -926,28 +966,17 @@ void	search_best_ways(s_rezult **rez, int ant)
 	if (num_ways > 1 && (ant + len_rez(rez[0]) < (ant / 2 + len_rez(rez[1]))))
 	{	
 		ants_on_way[0] = ant;
-		return ;
+		return (NULL);
 	}
 	while (i < num_ways)
 	{
 		if (i == 0)
-			time[i] = ant / num_ways + (ant % num_ways) + len_rez[0];
+			time[i] = ant / num_ways + (ant % num_ways) + len_rez(rez[0]);
 		else
-			time[i] = ant / num_ways + len_rez[i];
+			time[i] = ant / num_ways + len_rez(rez[i]);
 		i++;
 	}
-	// if (ant > len_rez[0])
-	// while {rez[i]
-	//		if (len_rez > ant)
-
-	//	}
-	// time1 = ant / var_ways + ant % var_ways + len_first_way
-	// time2 = ant / var_ways + len_second_way;
-	// time3 = ant / var_ways + len_second_way;
-	// time3 = time3 - ((time3 - time1) / 3 + ((time3 - time1)  % 3)
-	// time2 = time2 + ((time3 - time1) / 3 - ((time2 - time1) / 2)
-	// time1 = time2 + ((time3 - time1) / 3 - ((time2 - time1) / 2) + ((time2 - time1) % 2)
-
+	return (count_antway(rez, ants_on_way, time));
 }
 
 
@@ -958,6 +987,7 @@ int 	main_alg(s_map *head)
 	char	*end;
 	s_rezult **rez;
 	int		numnbr_start;
+	int		*ants_on_way;
 
 	i = 0;
 	numnbr_start = search_st_nbr(head);
@@ -974,9 +1004,8 @@ int 	main_alg(s_map *head)
 	}
 	del_cross_rez(rez);
 	print_draft(rez);
-	ft_printf ("%d\n", 1000 % 1);
-	//search_best_ways(rez, head->ant);
-	//print_rezult(rez, head->ant);
+	ants_on_way = search_best_ways(rez, head->ant);
+	print_rezult(rez, head->ant, ants_on_way);
 	free_main_rez(rez);
 	free(rez);
 	return (1);
