@@ -13,8 +13,6 @@
 #ifndef LEM_IN_H
 # define LEM_IN_H
 
-#include <stdio.h>
-
 #include "../libft/libft.h"
 #include <fcntl.h>
 

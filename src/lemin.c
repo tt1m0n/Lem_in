@@ -71,7 +71,21 @@ int 	check_space(char **split)
 	return (1);
 }
 
-int 	check_pipe(char *line)
+int		check_existence(char *str, s_map *head)
+{
+	s_room *tmp;
+
+	tmp = head->allroom;
+	while (tmp != NULL)
+	{
+		if (ft_strcmp(str, tmp->name) == 0)
+			return (1);
+		tmp = tmp->nextroom;
+	}
+	return (0);
+}
+
+int 	check_pipe(char *line, s_map *head)
 {
 	char **split;
 
@@ -79,7 +93,20 @@ int 	check_pipe(char *line)
 		return (0);
 	split = ft_strsplit(line, '-');
 	if (check_same_room(split) == 0 || check_space(split) == 0)
+	{
+		free(split[0]);
+		free(split[1]);
+		free(split);	
 		return (0);
+	}	
+	if (check_existence(split[0], head) == 0 ||
+		check_existence(split[1], head) == 0)
+	{	
+		free(split[0]);
+		free(split[1]);
+		free(split);
+		return (0);
+	}	
 	free(split[0]);
 	free(split[1]);
 	free(split);
@@ -127,7 +154,7 @@ int 	check_room(char *line)
 	return (1);
 }
 
-int		check_bad_line(char *line)
+int		check_bad_line(char *line, s_map *head)
 {
 	int i;
 	int count;
@@ -141,7 +168,7 @@ int		check_bad_line(char *line)
 	}
 	if (count == 1)
 	{
-		if (check_pipe(line))
+		if (check_pipe(line, head))
 			return (2);
 		return (0);
 	}
@@ -150,7 +177,7 @@ int		check_bad_line(char *line)
 	return(check_room(line));
 }
 
-int		check_line(char *line, s_check *check)
+int		check_line(char *line, s_check *check, s_map *head)
 {
 	if (strncmp(line, "##start", 8) == 0)
 	{
@@ -167,7 +194,7 @@ int		check_line(char *line, s_check *check)
 		return (3);
 	if (line[0] == '\0' || line[0] == ' ')
 		return (0);
-	return (check_bad_line(line));
+	return (check_bad_line(line, head));
 }
 
 int 	check_after_read(s_check check)
@@ -270,10 +297,10 @@ int		check_add_room(char *line, s_map *head, int flag)
 int		startline_if(int fd, char **line, s_check *check, s_map *head)
 {
 	ft_get_next_line(fd, line);
-	if (check_line(*line, check) == 1)
+	if (check_line(*line, check, head) == 1)
 		if (check_add_room(*line, head, 1) == 0)
 			return (0);
-	if (check_line(*line, check) == 0)
+	if (check_line(*line, check, head) == 0)
 		return (0);
 	return (1);
 }
@@ -281,10 +308,10 @@ int		startline_if(int fd, char **line, s_check *check, s_map *head)
 int		endline_if(int fd, char **line, s_check *check, s_map *head)
 {
 	ft_get_next_line(fd, line);
-	if (check_line(*line, check) == 1)
+	if (check_line(*line, check, head) == 1)
 		if (check_add_room(*line, head, 2) == 0)
 			return (0);
-	if (check_line(*line, check) == 0)
+	if (check_line(*line, check, head) == 0)
 		return (0);
 	return (1);
 }
@@ -294,13 +321,13 @@ int		write_room(int fd, char **line, s_map *head, s_check *check)
 	char	*tmp;
 
 	tmp = *line;
-	if (strncmp(*line, "##start", 8) == 0)
+	if (ft_strncmp(*line, "##start", 8) == 0)
 	{
 		free(tmp);
 		if (startline_if(fd, line, check, head) == 0)
 			return (0);
 	}
-	else if (strncmp(*line, "##end", 6) == 0)
+	else if (ft_strncmp(*line, "##end", 6) == 0)
 	{
 		free(tmp);
 		if (endline_if(fd, line, check, head) == 0)
@@ -343,7 +370,11 @@ int		add_nbr(s_room *head, char *name, s_check *check)
 	while (tmp->nextnbr != NULL)
 		tmp = tmp->nextnbr;
 	if (ft_strcmp(tmp->name, new_nbr->name) == 0)
+	{	
+		free(new_nbr->name);
+		free(new_nbr);
 		return (0);
+	}	
 	tmp->nextnbr = new_nbr;
 	return (1);
 }
@@ -397,7 +428,7 @@ int		write_ant(char *line, s_map *head)
 		if (!(ft_isdigit(line[i++])))
 			return (0);
 	head->ant = ft_atoi_ant(line);
-	if (head->ant == 0)
+	if (head->ant == 0 || head->ant > 1000000)
 		return (0);
 	return (1);
 }
@@ -430,6 +461,7 @@ void	free_all_map(s_map *map)
 		tmproom = tmproom->nextroom;
 		free_nbr(prevroom->headnbr);
 		free(prevroom->name);
+		prevroom->name = NULL;
 		prevroom = tmproom;
 	}
 }
@@ -580,14 +612,14 @@ int		check_stack_used(s_nbr *tmpnbr, s_qeueu *stack, s_used *used, s_map *head)
 	return (1);
 }
 
-void	search_add_end(s_used *used, s_rezult **rez, char *end)
+int		search_add_end(s_used *used, s_rezult **rez, char *end)
 {
 	s_rezult	*new;
 	s_used		*tmpused;
 
 	tmpused = used;
 	if (!(new = (s_rezult*)malloc(sizeof(s_rezult))))
-		return ;
+		return (0);
 	new->next = NULL;
 	while(tmpused != NULL)
 	{
@@ -596,10 +628,12 @@ void	search_add_end(s_used *used, s_rezult **rez, char *end)
 			new->name = ft_strdup(end);
 			new->predecessor = ft_strdup(tmpused->predecessor);
 			(*rez) = new;
-			return ;
+			return (1);
 		}
 		tmpused = tmpused->next;
 	}
+	free(new);
+	return (0);
 }
 
 s_nbr	*search_room(s_map *head, char *name)
@@ -623,7 +657,8 @@ int		add_rezult(s_rezult **rez, s_used *used, char *end)
 	tmp = (*rez);
 	if (tmp == NULL)
 	{
-		search_add_end(used, rez, end);
+		if (search_add_end(used, rez, end) == 0)
+			return (0);
 		if (ft_strcmp((*rez)->name, (*rez)->predecessor) == 0)
 			return (0);
 		return (1);
@@ -740,7 +775,7 @@ void	print_draft(s_rezult **rez)
 		tmp = rez[i];
 		while (tmp != NULL)
 		{
-			printf ("(%s) ->", tmp->name);
+			ft_printf ("(%s) ->", tmp->name);
 			tmp = tmp->next;
 		}
 		printf ("\n");
@@ -748,32 +783,17 @@ void	print_draft(s_rezult **rez)
 	}
 }
 
-/*
-void	print_rezult(s_rezult **rez, char *end, int ant)
-{
-	int i;
-	int j;
-
-	i = 1;
-	j = 0;
-	while (i < ant)
-	{
-		while (rez[j] != NULL)
-		{
-			printf ("L%d-%s ", i, rez[j]->name);
-			rez = rez[j]->next;
-		}
-	}
-}*/
-
 int		len_rez(s_rezult *rez)
 {
+	s_rezult *tmp;
+
+	tmp = rez;
 	int i;
 
 	i = 0;
-	while (rez != NULL)
+	while (tmp != NULL)
 	{
-		rez = rez->next;
+		tmp = tmp->next;
 		i++;
 	}
 	return (i);
@@ -788,7 +808,23 @@ void	swap_rez(s_rezult **rez, int i)
 	rez[i - 1] = tmp;
 }
 
-void	compare_rez(s_rezult **rez, int i)
+void	free_dublicat_rez(s_rezult **rez)
+{
+	s_rezult *tmp;
+	s_rezult *prev;
+
+	tmp = (*rez);
+	while (tmp != NULL)
+	{
+		prev = tmp;
+		tmp = tmp->next;
+		free(prev->name);
+		free(prev->predecessor);
+		free(prev);
+	}
+}
+
+int		compare_rez(s_rezult **rez, int i)
 {
 	s_rezult *tmpnext;
 	s_rezult *tmpprev;
@@ -805,15 +841,14 @@ void	compare_rez(s_rezult **rez, int i)
 			{
 				if (ft_strcmp(tmpnext->name, tmpprev->name) == 0)
 				{
-					free(tmpnext->name);
-					free(tmpnext->predecessor);
-					free(tmpnext);
+					free_dublicat_rez(&rez[i]);
 					rez[i] = rez[i + 1];
 					while (rez[i] != NULL)
 					{
-						rez[i] = rez[i + 1];
 						i++;
+						rez[i] = rez[i + 1];
 					}
+					return (0);
 				}
 				tmpprev = tmpprev->next;
 			}
@@ -821,28 +856,108 @@ void	compare_rez(s_rezult **rez, int i)
 		}	
 		tmpnext = tmpnext->next;
 	}
+	return (1);
 }
 
 void	del_cross_rez(s_rezult **rez)
 {
 	int i;
-	int j;
 
 	i = 0;
 	while (rez[i] != NULL)
 	{
 		if (i != 0)
-			compare_rez(rez, i);
+			if (!(compare_rez(rez, i)))
+				i--;
 		i++;
 	}
 }
 
+// ++++++++++++++++++++++++++ START PRINT REZULT START=================================
+/*
+void	init_print_ant(s_rezult **ant, s_rezult **rez, int count)
+{
+	int		i;
+
+	i = 0;
+	while (i < count)
+	{
+		ant[i] = rez[0];
+		printf ("%d = (%s)\n", i, ant[i]->name);
+		i++;
+	}
+}
+
+void	print_rezult(s_rezult **rez, int ant)
+{
+	s_rezult *print_ant[ant];
+	init_print_ant(print_ant, rez, ant);
+} */
+
+// ++++++++++++++++++++++++++ END PRINT REZULT END=================================
+
+
+// +++++++++++++++++++++++++START SEARCH BEST ++++++++++++++++++++++++++++++++
+
+int		count_rez(s_rezult **rez)
+{
+	s_rezult *tmp;
+	int		i;
+
+	i = 0;
+	tmp = (*rez);
+	while (tmp != NULL)
+	{
+		tmp = tmp->next;
+		i++;
+	}
+	return (i);
+}
+
+void	search_best_ways(s_rezult **rez, int ant)
+{
+	int		num_of_ways;
+	int		ants_on_way[count_rez(rez)];
+	int		time[count_rez(rez)]
+	int		i;
+
+	i = 0;
+	num_ways = count_rez(rez);
+	if (num_ways > 1 && (ant + len_rez(rez[0]) < (ant / 2 + len_rez(rez[1]))))
+	{	
+		ants_on_way[0] = ant;
+		return ;
+	}
+	while (i < num_ways)
+	{
+		if (i == 0)
+			time[i] = ant / num_ways + (ant % num_ways) + len_rez[0];
+		else
+			time[i] = ant / num_ways + len_rez[i];
+		i++;
+	}
+	// if (ant > len_rez[0])
+	// while {rez[i]
+	//		if (len_rez > ant)
+
+	//	}
+	// time1 = ant / var_ways + ant % var_ways + len_first_way
+	// time2 = ant / var_ways + len_second_way;
+	// time3 = ant / var_ways + len_second_way;
+	// time3 = time3 - ((time3 - time1) / 3 + ((time3 - time1)  % 3)
+	// time2 = time2 + ((time3 - time1) / 3 - ((time2 - time1) / 2)
+	// time1 = time2 + ((time3 - time1) / 3 - ((time2 - time1) / 2) + ((time2 - time1) % 2)
+
+}
+
+
+// +++++++++++++++++++++++++END SEARCH BEST ++++++++++++++++++++++++++
 int 	main_alg(s_map *head)
 {
+	int		i;
 	char	*end;
 	s_rezult **rez;
 	int		numnbr_start;
-	int i;
 
 	i = 0;
 	numnbr_start = search_st_nbr(head);
@@ -859,7 +974,9 @@ int 	main_alg(s_map *head)
 	}
 	del_cross_rez(rez);
 	print_draft(rez);
-//	print_rezult(rez, end, head->ant);
+	ft_printf ("%d\n", 1000 % 1);
+	//search_best_ways(rez, head->ant);
+	//print_rezult(rez, head->ant);
 	free_main_rez(rez);
 	free(rez);
 	return (1);
@@ -873,12 +990,15 @@ int		read_cycle(int fd, s_check *check, s_map *head)
 
 	while (ft_get_next_line(fd, &line) > 0)
 	{
-		if (check_line(line, check) == 1)
+		if (check_line(line, check, head) == 1)
 			if (write_room(fd, &line, head, check) == 0)
+			{	
+				free(line);
 				return (0);
-		if (check_line(line, check) == 2)
+			}
+		if (check_line(line, check, head) == 2)
 			write_pipe(line, head, check);
-		if (check_line(line, check) == 0)
+		if (check_line(line, check, head) == 0)
 		{
 			free(line);
 			break;
@@ -941,7 +1061,7 @@ int		main (int argc, char **argv)
 		fd = open(argv[1], O_RDONLY);
 		if (read_map(fd, &head) == 0)
 		{
-			ft_putstr("ERROR");
+			ft_putstr("ERROR\n");
 			free_all_map(&head);
 			return (0);
 		}
@@ -950,6 +1070,8 @@ int		main (int argc, char **argv)
 		free_all_map(&head);
 		close (fd);
 	}
+	else
+		ft_putstr("ERROR\n");
 //	system("leaks lemin");
 	return (0);
 }
