@@ -323,12 +323,14 @@ int		write_room(int fd, char **line, s_map *head, s_check *check)
 	tmp = *line;
 	if (ft_strncmp(*line, "##start", 8) == 0)
 	{
+		ft_printf("%s\n", *line);
 		free(tmp);
 		if (startline_if(fd, line, check, head) == 0)
 			return (0);
 	}
 	else if (ft_strncmp(*line, "##end", 6) == 0)
 	{
+		ft_printf("%s\n", *line);
 		free(tmp);
 		if (endline_if(fd, line, check, head) == 0)
 			return (0);
@@ -775,10 +777,10 @@ void	print_draft(s_rezult **rez)
 		tmp = rez[i];
 		while (tmp != NULL)
 		{
-			ft_printf ("(%s) ->", tmp->name);
+		//	ft_printf ("(%s) ->", tmp->name);
 			tmp = tmp->next;
 		}
-		ft_printf ("\n");
+	//	ft_printf ("\n");
 		i++;
 	}
 }
@@ -893,22 +895,71 @@ void	init_print_ant(s_rezult **ant, s_rezult **rez, int count, int *ants_on_way)
 {
 	int		i;
 	int 	j;
-	int		stop[count_rez(rez)];
 
 	i = 0;
 	while (i < count)
 	{
 		j = 0;
-		while (rez[j] != NULL)
-		ant[i] = rez[0];
-
+		while (j < count_rez(rez))
+		{
+			if (ants_on_way[j] > 0)
+			{	
+				ant[i] = rez[j];
+			//	ft_printf("(%d) = %s\n", i, ant[i]->name);
+				ants_on_way[j] = ants_on_way[j] - 1;
+				i++;
+				j++;
+			}
+			else
+				j++;	
+		}
 	}
+}
+
+int		count_notzero_way(int *ants_on_way, s_rezult **rez)
+{
+	int i;
+	int count;
+
+	i = 0;
+	count = 0;
+	while (rez[i] != NULL)
+	{
+		if (ants_on_way[i] > 0)
+			count++;
+		i++;
+	}
+//	ft_printf("coun t== %d\n", count);
+	return (count);
 }
 
 void	print_rezult(s_rezult **rez, int ant, int *ants_on_way)
 {
+	int i;
+	int	j;
+	int size_print;
+	int step;
 	s_rezult *print_ant[ant];
+
+	i = 0;
+	size_print = count_notzero_way(ants_on_way, rez);
+	step = size_print;
 	init_print_ant(print_ant, rez, ant, ants_on_way);
+	while (print_ant[ant - 1] != NULL)
+	{
+		j = 0;
+		while (j < size_print && j < ant)
+		{
+			if (print_ant[j] != NULL)
+			{	
+				ft_printf ("L%d-%s ", j + 1, print_ant[j]->name);
+				print_ant[j] = print_ant[j]->next;
+			}
+			j++;
+		}
+		ft_printf("\n");
+		size_print = size_print + step;
+	}	
 }
 
 // ++++++++++++++++++++++++++ END PRINT REZULT END=================================
@@ -931,7 +982,7 @@ int		count_middle(s_rezult **rez, int *time)
 	return (count);
 }
 
-int		*count_antway(s_rezult **rez, int *onway, int *time)
+void		count_antway(s_rezult **rez, int **onway, int *time)
 {
 	int middle;
 	int i;
@@ -942,22 +993,20 @@ int		*count_antway(s_rezult **rez, int *onway, int *time)
 	middle = count_middle(rez, time);
 	while (rez[i] != NULL)
 	{
-		ft_printf("time == %d\n", time[i]);
+	//	ft_printf("time == %d\n", time[i]);
 		if (i == 0)
-			onway[i] = time[i] + middle / num_rez + (middle % num_rez)
+			(*onway)[i] = time[i] + middle / num_rez + (middle % num_rez)
 			- time[i] - len_rez(rez[i]);
 		else
-			onway[i] = time[i] + middle / num_rez - time[i] - len_rez(rez[i]);
-		ft_printf("ants == %d\n", onway[i]);
+			(*onway)[i] = time[i] + middle / num_rez - time[i] - len_rez(rez[i]);
+	//	ft_printf("ants == %d (%d)\n", (*onway)[i], i);
 		i++;
 	}
-	return (onway);
 }
 
-int		*search_best_ways(s_rezult **rez, int ant)
+void		search_best_ways(s_rezult **rez, int ant, int **ants_on_way)
 {
 	int		num_ways;
-	int		ants_on_way[count_rez(rez)];
 	int		time[count_rez(rez)];
 	int		i;
 
@@ -965,8 +1014,8 @@ int		*search_best_ways(s_rezult **rez, int ant)
 	num_ways = count_rez(rez);
 	if (num_ways > 1 && (ant + len_rez(rez[0]) < (ant / 2 + len_rez(rez[1]))))
 	{	
-		ants_on_way[0] = ant;
-		return (NULL);
+		(*ants_on_way)[0] = ant;
+		return ;
 	}
 	while (i < num_ways)
 	{
@@ -976,7 +1025,7 @@ int		*search_best_ways(s_rezult **rez, int ant)
 			time[i] = ant / num_ways + len_rez(rez[i]);
 		i++;
 	}
-	return (count_antway(rez, ants_on_way, time));
+	count_antway(rez, ants_on_way, time);
 }
 
 
@@ -1004,10 +1053,13 @@ int 	main_alg(s_map *head)
 	}
 	del_cross_rez(rez);
 	print_draft(rez);
-	ants_on_way = search_best_ways(rez, head->ant);
+	if (!(ants_on_way = (int*)malloc(sizeof(int) * count_rez(rez))))
+		return (0);
+	search_best_ways(rez, head->ant, &ants_on_way);
 	print_rezult(rez, head->ant, ants_on_way);
 	free_main_rez(rez);
 	free(rez);
+	free(ants_on_way);
 	return (1);
 }
 
@@ -1032,8 +1084,10 @@ int		read_cycle(int fd, s_check *check, s_map *head)
 			free(line);
 			break;
 		}
+		ft_printf ("%s\n", line);
 		free(line);
 	}
+	ft_printf("\n");
 	return (1);
 }
 
@@ -1049,6 +1103,7 @@ int		read_map(int fd, s_map *head)
 	ft_get_next_line(fd, &line);
 	if (!(write_ant(line, head)))
 		return (0);
+	ft_printf("%s\n", line);
 	free(line);
 	if (read_cycle(fd, &check, head) == 0)
 		return (0);
@@ -1080,14 +1135,15 @@ void	start_first(s_map *head)
 	}
 }
 
-int		main (int argc, char **argv)
+int		main (int argc)
 {
 	int		fd;
 	s_map	head;
 
-	if (argc == 2)
+	if (argc == 1)
 	{
-		fd = open(argv[1], O_RDONLY);
+	//	fd = open(argv[1], O_RDONLY);
+		fd = 0;
 		if (read_map(fd, &head) == 0)
 		{
 			ft_putstr("ERROR\n");
