@@ -24,7 +24,7 @@ void	extract_name_room(char *line, t_room **new_room)
 	free(split);
 }
 
-void	extract_coord(char *line, t_room **new_room) 
+void	extract_coord(char *line, t_room **new_room)
 {
 	char **split;
 

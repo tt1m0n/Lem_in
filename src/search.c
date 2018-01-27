@@ -12,7 +12,7 @@
 
 #include "lem_in.h"
 
-int 	search_st_nbr(t_map *head)
+int		search_st_nbr(t_map *head)
 {
 	int		i;
 	t_nbr	*tmpnbr;
@@ -50,7 +50,7 @@ int		search_add_end(t_used *used, t_rezult **rez, char *end)
 	if (!(new = (t_rezult*)malloc(sizeof(t_rezult))))
 		return (0);
 	new->next = NULL;
-	while(tmpused != NULL)
+	while (tmpused != NULL)
 	{
 		if (ft_strcmp(tmpused->name, end) == 0)
 		{
@@ -65,15 +65,15 @@ int		search_add_end(t_used *used, t_rezult **rez, char *end)
 	return (0);
 }
 
-void		search_add_predecessor(t_used *used, t_rezult **rez)
+void	search_add_predecessor(t_used *used, t_rezult **rez)
 {
 	t_rezult	*new;
-	t_used	*tmpused;
+	t_used		*tmpused;
 
 	tmpused = used;
 	if (!(new = (t_rezult*)malloc(sizeof(t_rezult))))
 		return ;
-	while(tmpused != NULL)
+	while (tmpused != NULL)
 	{
 		if (ft_strcmp(tmpused->name, (*rez)->predecessor) == 0)
 		{
@@ -87,7 +87,7 @@ void		search_add_predecessor(t_used *used, t_rezult **rez)
 	}
 }
 
-void		search_best_ways(t_rezult **rez, int ant, int **ants_on_way)
+void	search_best_ways(t_rezult **rez, int ant, int **ants_on_way)
 {
 	int		num_ways;
 	int		time[count_rez(rez)];
@@ -96,7 +96,7 @@ void		search_best_ways(t_rezult **rez, int ant, int **ants_on_way)
 	i = 0;
 	num_ways = count_rez(rez);
 	if (num_ways > 1 && (ant + len_rez(rez[0]) < (ant / 2 + len_rez(rez[1]))))
-	{	
+	{
 		(*ants_on_way)[0] = ant;
 		return ;
 	}

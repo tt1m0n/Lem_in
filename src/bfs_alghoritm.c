@@ -14,8 +14,8 @@
 
 void	print_draft(t_rezult **rez)            //// DEL DEL DEL
 {
-	int i;
-	t_rezult *tmp;
+	int			i;
+	t_rezult	*tmp;
 
 	i = 0;
 	while (rez[i] != NULL)
@@ -23,10 +23,10 @@ void	print_draft(t_rezult **rez)            //// DEL DEL DEL
 		tmp = rez[i];
 		while (tmp != NULL)
 		{
-			ft_printf ("(%s) ->", tmp->name);
+			ft_printf("(%s) ->", tmp->name);
 			tmp = tmp->next;
 		}
-		ft_printf ("\n");
+		ft_printf("\n");
 		i++;
 	}
 }
@@ -36,15 +36,15 @@ void	swap_rez(t_rezult **rez, int i)
 	t_rezult	*tmp;
 
 	while (i > 0)
-	{	
+	{
 		tmp = rez[i];
 		rez[i] = rez[i - 1];
 		rez[i - 1] = tmp;
 		i--;
-	}	
+	}
 }
 
-void 	null_rez_array(t_rezult ***rez, int num)
+void	null_rez_array(t_rezult ***rez, int num)
 {
 	int i;
 
@@ -53,7 +53,7 @@ void 	null_rez_array(t_rezult ***rez, int num)
 	{
 		(*rez)[i] = NULL;
 		i++;
-	}	
+	}
 }
 
 char	*search_flag(t_map *head, int flag)
@@ -70,11 +70,10 @@ char	*search_flag(t_map *head, int flag)
 	return (NULL);
 }
 
-
 void	make_bfs(t_rezult ***rez, t_map *head, int numnbr_start)
 {
-	int i;
-	char *end;
+	int		i;
+	char	*end;
 
 	i = 0;
 	null_rez_array(rez, numnbr_start * 2 + 1);
@@ -89,11 +88,11 @@ void	make_bfs(t_rezult ***rez, t_map *head, int numnbr_start)
 	}
 }
 
-int 	main_alg(t_map *head)
+int		main_alg(t_map *head)
 {
-	t_rezult **rez;
-	int		numnbr_start;
-	int		*ants_on_way;
+	t_rezult	**rez;
+	int			numnbr_start;
+	int			*ants_on_way;
 
 	numnbr_start = search_st_nbr(head);
 	rez = (t_rezult**)malloc(sizeof(t_rezult*) * (numnbr_start * 2 + 1));

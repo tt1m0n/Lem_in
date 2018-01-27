@@ -32,7 +32,7 @@ int		compare_rez(t_rezult **rez, int i)
 				tmpprev = tmpprev->next;
 			}
 			j++;
-		}	
+		}
 		tmpnext = tmpnext->next;
 	}
 	return (1);

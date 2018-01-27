@@ -35,27 +35,19 @@ void	start_first(t_map *head)
 	}
 }
 
-int		main (int argc, char **argv)
+int		main(void)
 {
-	int		fd;
 	t_map	head;
 
-	if (argc == 2)
+	if (read_map(&head) == 0)
 	{
-		fd = open(argv[1], O_RDONLY);
-		if (read_map(fd, &head) == 0)
-		{
-			ft_putstr("ERROR\n");
-			free_all_map(&head);
-			return (0);
-		}
-		start_first(&head);
-		main_alg(&head);
-		free_all_map(&head);
-		close (fd); // del
-	}
-	else
 		ft_putstr("ERROR\n");
-	system("leaks lem-in");
+		free_all_map(&head);
+		return (0);
+	}
+	start_first(&head);
+	main_alg(&head);
+	free_all_map(&head);
+//	system("leaks lem-in");
 	return (0);
 }

@@ -34,9 +34,9 @@ void	free_used(t_used *used)
 
 void	free_main_rez(t_rezult **rez)
 {
-	int i;
-	t_rezult *tmp;
-	t_rezult *prev;
+	int			i;
+	t_rezult	*tmp;
+	t_rezult	*prev;
 
 	i = 0;
 	while (rez[i] != NULL)

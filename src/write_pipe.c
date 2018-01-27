@@ -38,16 +38,16 @@ int		add_nbr(t_room *head, char *name, t_check *check)
 	while (tmp->nextnbr != NULL)
 		tmp = tmp->nextnbr;
 	if (ft_strcmp(tmp->name, new_nbr->name) == 0)
-	{	
+	{
 		free(new_nbr->name);
 		free(new_nbr);
 		return (0);
-	}	
+	}
 	tmp->nextnbr = new_nbr;
 	return (1);
 }
 
-int 	check_add_nbr(char *room, char *nbr, t_map *head, t_check *check)
+int		check_add_nbr(char *room, char *nbr, t_map *head, t_check *check)
 {
 	t_room	*tmp;
 
@@ -73,7 +73,7 @@ int		add_pipe(char **split, t_map *head, t_check *check)
 	return (1);
 }
 
-void 	write_pipe(char *line, t_map *head, t_check *check)
+void	write_pipe(char *line, t_map *head, t_check *check)
 {
 	char **split;
 

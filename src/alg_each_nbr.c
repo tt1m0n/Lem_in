@@ -12,7 +12,8 @@
 
 #include "lem_in.h"
 
-int		check_stack_used(t_nbr *tmpnbr, t_qeueu *stack, t_used *used, t_map *head)
+int		check_stack_used(t_nbr *tmpnbr, t_qeueu *stack,
+							t_used *used, t_map *head)
 {
 	t_nbr	*startnbr;
 

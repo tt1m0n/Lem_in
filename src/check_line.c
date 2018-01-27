@@ -19,7 +19,7 @@ void	free_split(char ***split, int i)
 	free(*split);
 }
 
-int 	check_room(char *line)
+int		check_room(char *line)
 {
 	char	**split;
 	int		i;
@@ -42,7 +42,7 @@ int 	check_room(char *line)
 	return (1);
 }
 
-int 	check_pipe(char *line, t_map *head)
+int		check_pipe(char *line, t_map *head)
 {
 	char **split;
 
@@ -53,17 +53,17 @@ int 	check_pipe(char *line, t_map *head)
 	{
 		free(split[0]);
 		free(split[1]);
-		free(split);	
+		free(split);
 		return (0);
-	}	
+	}
 	if (check_existence(split[0], head) == 0 ||
 		check_existence(split[1], head) == 0)
-	{	
+	{
 		free(split[0]);
 		free(split[1]);
 		free(split);
 		return (0);
-	}	
+	}
 	free(split[0]);
 	free(split[1]);
 	free(split);
@@ -90,7 +90,7 @@ int		check_bad_line(char *line, t_map *head)
 	}
 	if (count > 1)
 		return (0);
-	return(check_room(line));
+	return (check_room(line));
 }
 
 int		check_line(char *line, t_check *check, t_map *head)
@@ -100,13 +100,13 @@ int		check_line(char *line, t_check *check, t_map *head)
 		check->count_st_sharp++;
 		return (1);
 	}
-	if (ft_strncmp(line, "##end", 6) == 0) 
+	if (ft_strncmp(line, "##end", 6) == 0)
 	{
 		check->count_end_sharp++;
 		return (1);
 	}
-	if ((line[0] == '#' && line[1] != '#' ) ||
-	 (line[0] == '#' && line[1] == '#' && line[2] == '#'))
+	if ((line[0] == '#' && line[1] != '#') ||
+		(line[0] == '#' && line[1] == '#' && line[2] == '#'))
 		return (3);
 	if (line[0] == '\0' || line[0] == ' ')
 		return (0);

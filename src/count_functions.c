@@ -53,7 +53,7 @@ int		count_middle(t_rezult **rez, int *time)
 	return (count);
 }
 
-void		count_antway(t_rezult **rez, int **onway, int *time)
+void	count_antway(t_rezult **rez, int **onway, int *time)
 {
 	int middle;
 	int i;
@@ -64,13 +64,12 @@ void		count_antway(t_rezult **rez, int **onway, int *time)
 	middle = count_middle(rez, time);
 	while (rez[i] != NULL)
 	{
-	//	ft_printf("time == %d\n", time[i]);
 		if (i == 0)
-			(*onway)[i] = time[i] + middle / num_rez + (middle % num_rez)
-			- time[i] - len_rez(rez[i]);
+			(*onway)[i] = time[i] + middle / num_rez + (middle % num_rez) -
+			time[i] - len_rez(rez[i]);
 		else
-			(*onway)[i] = time[i] + middle / num_rez - time[i] - len_rez(rez[i]);
-	//	ft_printf("ants == %d (%d)\n", (*onway)[i], i);
+			(*onway)[i] = time[i] + middle / num_rez -
+			time[i] - len_rez(rez[i]);
 		i++;
 	}
 }

@@ -12,7 +12,7 @@
 
 #include "lem_in.h"
 
-void		pop_first_stack(t_qeueu **stack)
+void	pop_first_stack(t_qeueu **stack)
 {
 	t_qeueu *del;
 
@@ -28,12 +28,11 @@ void		pop_first_stack(t_qeueu **stack)
 
 int		len_rez(t_rezult *rez)
 {
-	t_rezult *tmp;
-
-	tmp = rez;
-	int i;
+	int			i;
+	t_rezult	*tmp;
 
 	i = 0;
+	tmp = rez;
 	while (tmp != NULL)
 	{
 		tmp = tmp->next;

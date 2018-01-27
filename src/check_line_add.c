@@ -12,14 +12,14 @@
 
 #include "lem_in.h"
 
-int 	check_same_room(char **split)
+int		check_same_room(char **split)
 {
 	if (ft_strcmp(split[0], split[1]) == 0)
 		return (0);
 	return (1);
 }
 
-int 	check_space(char **split)
+int		check_space(char **split)
 {
 	int i;
 
@@ -48,7 +48,7 @@ int		check_existence(char *str, t_map *head)
 	return (0);
 }
 
-int 	check_if_alpha(char *str)
+int		check_if_alpha(char *str)
 {
 	int	i;
 

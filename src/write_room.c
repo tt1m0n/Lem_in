@@ -22,7 +22,6 @@ int		check_add_room(char *line, t_map *head, int flag)
 	init_newroom(line, &new_room, flag);
 	if (check_new_room(&new_room, head->allroom) == 0)
 		return (0);
-	//printf ("list == %s x == %d y == %d\n", new_room->name, new_room->x, new_room->y);
 	if (head->allroom == NULL)
 	{
 		head->allroom = new_room;
@@ -75,9 +74,8 @@ int		write_room(int fd, char **line, t_map *head, t_check *check)
 		if (endline_if(fd, line, check, head) == 0)
 			return (0);
 	}
-	else
-		if (check_add_room(*line, head, 0) == 0)
-			return (0);
+	else if (check_add_room(*line, head, 0) == 0)
+		return (0);
 	check->room++;
 	return (1);
 }
