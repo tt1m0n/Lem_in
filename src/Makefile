@@ -12,7 +12,10 @@
 
 FLAGS = -Wall -Werror -Wextra -c
 
-SRC = lemin.c
+SRC = main.c read.c check_line.c check_line_add.c\
+	  write_room.c init_room.c write_pipe.c bfs_alghoritm.c\
+      search.c free_functions.c alg_each_nbr.c count_functions.c\
+      print_rezult.c del_cross_rez.c add_func.c
 
 OBJ	= $(SRC:.c=.o)
 
