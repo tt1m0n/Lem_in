@@ -69,4 +69,5 @@ typedef struct		t_check
 	int 			room;
 }					s_check;
 
+
 #endif

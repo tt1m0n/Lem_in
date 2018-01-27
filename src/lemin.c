@@ -777,10 +777,10 @@ void	print_draft(s_rezult **rez)
 		tmp = rez[i];
 		while (tmp != NULL)
 		{
-		//	ft_printf ("(%s) ->", tmp->name);
+			ft_printf ("(%s) ->", tmp->name);
 			tmp = tmp->next;
 		}
-	//	ft_printf ("\n");
+		ft_printf ("\n");
 		i++;
 	}
 }
@@ -849,9 +849,8 @@ int		compare_rez(s_rezult **rez, int i)
 				{
 					free_dublicat_rez(&rez[i]);
 					rez[i] = rez[i + 1];
-					while (rez[i] != NULL)
+					while (rez[i++] != NULL)
 					{
-						i++;
 						rez[i] = rez[i + 1];
 					}
 					return (0);
@@ -905,7 +904,6 @@ void	init_print_ant(s_rezult **ant, s_rezult **rez, int count, int *ants_on_way)
 			if (ants_on_way[j] > 0)
 			{	
 				ant[i] = rez[j];
-			//	ft_printf("(%d) = %s\n", i, ant[i]->name);
 				ants_on_way[j] = ants_on_way[j] - 1;
 				i++;
 				j++;
@@ -929,23 +927,34 @@ int		count_notzero_way(int *ants_on_way, s_rezult **rez)
 			count++;
 		i++;
 	}
-//	ft_printf("coun t== %d\n", count);
 	return (count);
+}
+
+int		check_ant_end(s_rezult **print_ant, int ant)
+{
+	int		i;
+
+	i = 0;
+	while (i < ant)
+	{
+		if (print_ant[i] != NULL)
+			return (0);
+		i++;
+	}
+	return (1);
 }
 
 void	print_rezult(s_rezult **rez, int ant, int *ants_on_way)
 {
-	int i;
 	int	j;
 	int size_print;
 	int step;
 	s_rezult *print_ant[ant];
 
-	i = 0;
 	size_print = count_notzero_way(ants_on_way, rez);
 	step = size_print;
 	init_print_ant(print_ant, rez, ant, ants_on_way);
-	while (print_ant[ant - 1] != NULL)
+	while (1)
 	{
 		j = 0;
 		while (j < size_print && j < ant)
@@ -959,7 +968,9 @@ void	print_rezult(s_rezult **rez, int ant, int *ants_on_way)
 		}
 		ft_printf("\n");
 		size_print = size_print + step;
-	}	
+		if (check_ant_end(print_ant, ant))
+			break;
+	}
 }
 
 // ++++++++++++++++++++++++++ END PRINT REZULT END=================================
@@ -1030,27 +1041,34 @@ void		search_best_ways(s_rezult **rez, int ant, int **ants_on_way)
 
 
 // +++++++++++++++++++++++++END SEARCH BEST ++++++++++++++++++++++++++
+
+void	make_alg(s_rezult ***rez, s_map *head, int numnbr_start)
+{
+	int i;
+	char *end;
+
+	i = 0;
+	null_rez_array(rez, numnbr_start * 2 + 1);
+	end = search_flag(head, 2);
+	while (i < numnbr_start)
+	{
+		alg_each_nbr(end, head, &(*rez)[i], i);
+		if (i != 0)
+			if (len_rez((*rez)[i]) < len_rez((*rez)[i - 1]))
+				swap_rez(*rez, i);
+		i++;
+	}
+}
+
 int 	main_alg(s_map *head)
 {
-	int		i;
-	char	*end;
 	s_rezult **rez;
 	int		numnbr_start;
 	int		*ants_on_way;
 
-	i = 0;
 	numnbr_start = search_st_nbr(head);
 	rez = (s_rezult**)malloc(sizeof(s_rezult*) * (numnbr_start * 2 + 1));
-	null_rez_array(&rez, numnbr_start * 2 + 1);
-	end = search_flag(head, 2);
-	while (i < numnbr_start)
-	{
-		alg_each_nbr(end, head, &rez[i], i);
-		if (i != 0)
-			if (len_rez(rez[i]) < len_rez(rez[i - 1]))
-				swap_rez(rez, i);
-		i++;
-	}
+	make_alg(&rez, head, numnbr_start);
 	del_cross_rez(rez);
 	print_draft(rez);
 	if (!(ants_on_way = (int*)malloc(sizeof(int) * count_rez(rez))))
@@ -1135,15 +1153,14 @@ void	start_first(s_map *head)
 	}
 }
 
-int		main (int argc)
+int		main (int argc, char **argv)
 {
 	int		fd;
 	s_map	head;
 
-	if (argc == 1)
+	if (argc == 2)
 	{
-	//	fd = open(argv[1], O_RDONLY);
-		fd = 0;
+		fd = open(argv[1], O_RDONLY);
 		if (read_map(fd, &head) == 0)
 		{
 			ft_putstr("ERROR\n");
@@ -1157,6 +1174,6 @@ int		main (int argc)
 	}
 	else
 		ft_putstr("ERROR\n");
-//	system("leaks lemin");
+	system("leaks lem-in");
 	return (0);
 }
