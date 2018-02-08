@@ -68,12 +68,12 @@ void	print_rezult(t_rezult **rez, int ant, int *ants_on_way)
 		{
 			if (print_ant[j] != NULL)
 			{
-			//	ft_printf("L%d-%s ", j + 1, print_ant[j]->name);
+				ft_printf("L%d-%s ", j + 1, print_ant[j]->name);
 				print_ant[j] = print_ant[j]->next;
 			}
 			j++;
 		}
-	//	ft_printf("\n");
+		ft_printf("\n");
 		size_print = size_print + step;
 		if (check_ant_end(print_ant, ant))
 			break ;

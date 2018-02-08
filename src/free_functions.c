@@ -62,7 +62,7 @@ int		free_dublicat_rez(t_rezult **elem, t_rezult ***rez, int i)
 	t_rezult *tmp;
 	t_rezult *prev;
 
-	tmp = (*elem);
+	tmp = *elem;
 	while (tmp != NULL)
 	{
 		prev = tmp;

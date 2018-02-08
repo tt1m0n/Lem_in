@@ -29,7 +29,7 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
-typedef struct        s_lst
+typedef struct		s_lst
 {
 	char			*str;
 	int				fd;
@@ -123,7 +123,8 @@ char				*ft_prnt_itoa_uintmax(uintmax_t n);
 char				*ft_prnt_itoa_sizet(size_t n);
 char				*ft_prnt_itoaui_octhex(unsigned int n, int base, int x);
 char				*ft_prnt_itoaus_octhex(unsigned short n, int base, int x);
-char				*ft_prnt_itoaull_octhex(unsigned long long n, int base, int x);
+char				*ft_prnt_itoaull_octhex(unsigned long long n,
+											int base, int x);
 char				*ft_prnt_itoauimax_octhex(uintmax_t n, int base, int x);
 char				*ft_prnt_smsharp(const char *str);
 char				*ft_prnt_bgsharp(const char *str);
@@ -157,6 +158,7 @@ int					check_inv_char(char *str, char p, int *n);
 int					check_s_conv(char *str, va_list ap, int *n);
 int					check_octhex_conv(char *str, va_list ap, int *n);
 void				read_unicode_string(char *str, char **rez, va_list ap);
-int					check_conversion(const char *s, int i, va_list ap, int *ret);
+int					check_conversion(const char *s, int i,
+										va_list ap, int *ret);
 
 #endif

@@ -38,16 +38,20 @@ void	start_first(t_map *head)
 int		main(void)
 {
 	t_map	head;
+	t_print *print_lines;
+	int		gnl;
 
-	if (read_map(&head) == 0)
+	gnl = 0;
+	if (read_map(&head, &print_lines, gnl) == 0)
 	{
-		ft_putstr("ERROR\n");
+		ft_printf("ERROR\n");
 		free_all_map(&head);
 		return (0);
 	}
 	start_first(&head);
-	main_alg(&head);
+	if (!(main_alg(&head, print_lines)))
+		ft_printf("ERROR\n");
 	free_all_map(&head);
-//	system("leaks lem-in");
+	free_print_lines(print_lines);
 	return (0);
 }

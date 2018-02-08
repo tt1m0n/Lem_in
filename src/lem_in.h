@@ -14,7 +14,12 @@
 # define LEM_IN_H
 
 # include "../libft/libft.h"
-# include <fcntl.h> // del
+
+typedef struct		s_print
+{
+	char			*line;
+	struct s_print	*next;
+}					t_print;
 
 typedef struct		s_rezult
 {
@@ -70,15 +75,16 @@ typedef struct		s_check
 }					t_check;
 
 void				start_first(t_map *head);
-int					read_map(t_map *head);
+int					read_map(t_map *head, t_print **print_lines, int gnl);
 void				free_all_map(t_map *map);
-int					main_alg(t_map *head);
-int					read_cycle(t_check *check, t_map *head);
+int					main_alg(t_map *head, t_print *print_lines);
+int					read_cycle(t_check *check, t_map *head,
+								t_print **print_lines, int gnl);
 void				init_check_map(t_check *check, t_map *head);
 int					write_ant(char *line, t_map *head);
-int					write_room(int fd, char **line, t_map *head,
-								t_check *check);
-void				write_pipe(char *line, t_map *head, t_check *check);
+int					write_room(char **line, t_map *head,
+								t_check *check, t_print **print);
+int					write_pipe(char *line, t_map *head, t_check *check);
 int					check_line(char *line, t_check *check, t_map *head);
 int					check_after_read(t_check check);
 void				free_split(char ***split, int i);
@@ -90,8 +96,9 @@ void				init_newroom(char *line, t_room **new_room, int flag);
 int					check_new_room(t_room **new_room, t_room *head);
 void				null_rez_array(t_rezult ***rez, int num);
 char				*search_flag(t_map *head, int flag);
-void				alg_each_nbr(char *end, t_map *head,
+int					alg_each_nbr(char *end, t_map *head,
 								t_rezult **rez, int num);
+int					make_bfs(t_rezult ***rez, t_map *head, int numnbr_start);
 int					len_rez(t_rezult *rez);
 void				swap_rez(t_rezult **rez, int i);
 int					search_st_nbr(t_map *head);
@@ -100,6 +107,7 @@ int					count_rez(t_rezult **rez);
 void				search_best_ways(t_rezult **rez, int ant,
 									int **ants_on_way);
 void				print_rezult(t_rezult **rez, int ant, int *ants_on_way);
+void				print_all_lines(t_print *print_lines);
 void				free_main_rez(t_rezult **rez);
 int					search_add_end(t_used *used, t_rezult **rez, char *end);
 void				search_add_predecessor(t_used *used, t_rezult **rez);
@@ -111,5 +119,7 @@ int					add_rezult(t_rezult **rez, t_used *used, char *end);
 void				add_front_used(t_used **used, t_qeueu *stack);
 void				pop_first_stack(t_qeueu **stack);
 int					count_notzero_way(int *ants_on_way, t_rezult **rez);
+void				free_print_lines(t_print *print_lines);
+void				add_line_toprint(t_print **print, char *line);
 
 #endif

@@ -41,6 +41,29 @@ int		len_rez(t_rezult *rez)
 	return (i);
 }
 
+void	add_line_toprint(t_print **print, char *line)
+{
+	t_print *tmp;
+	t_print *new;
+
+	tmp = *print;
+	if (!(new = (t_print*)malloc(sizeof(t_print))))
+		return ;
+	if (ft_strcmp(line, "\n") == 0)
+		new->line = ft_strdup(line);
+	else
+		new->line = ft_strjoin(line, "\n");
+	new->next = NULL;
+	if (tmp == NULL)
+	{
+		*print = new;
+		return ;
+	}
+	while (tmp->next != NULL)
+		tmp = tmp->next;
+	tmp->next = new;
+}
+
 void	add_front_used(t_used **used, t_qeueu *stack)
 {
 	t_used	*new;
@@ -67,10 +90,7 @@ int		add_rezult(t_rezult **rez, t_used *used, char *end)
 	if (tmp == NULL)
 	{
 		if (search_add_end(used, rez, end) == 0)
-			return (0);
-		if (ft_strcmp((*rez)->name, (*rez)->predecessor) == 0)
-			return (0);
-		return (1);
+			return (-1);
 	}
 	if (ft_strcmp((*rez)->name, (*rez)->predecessor) == 0)
 		return (0);

@@ -33,9 +33,20 @@ int		check_add_room(char *line, t_map *head, int flag)
 	return (1);
 }
 
-int		endline_if(int fd, char **line, t_check *check, t_map *head)
+int		endline_if(char **line, t_check *check, t_map *head, t_print **print)
 {
-	ft_get_next_line(fd, line);
+	char	*tmp;
+
+	ft_get_next_line(0, line);
+	while (check_line(*line, check, head) == 3 ||
+			check_line(*line, check, head) == 4)
+	{
+		tmp = *line;
+		if (check_line(*line, check, head) != 4)
+			add_line_toprint(print, *line);
+		free(tmp);
+		ft_get_next_line(0, line);
+	}
 	if (check_line(*line, check, head) == 1)
 		if (check_add_room(*line, head, 2) == 0)
 			return (0);
@@ -44,9 +55,20 @@ int		endline_if(int fd, char **line, t_check *check, t_map *head)
 	return (1);
 }
 
-int		startline_if(int fd, char **line, t_check *check, t_map *head)
+int		startline_if(char **line, t_check *check, t_map *head, t_print **print)
 {
-	ft_get_next_line(fd, line);
+	char	*tmp;
+
+	ft_get_next_line(0, line);
+	while (check_line(*line, check, head) == 3 ||
+			check_line(*line, check, head) == 4)
+	{
+		tmp = *line;
+		if (check_line(*line, check, head) != 4)
+			add_line_toprint(print, *line);
+		free(tmp);
+		ft_get_next_line(0, line);
+	}
 	if (check_line(*line, check, head) == 1)
 		if (check_add_room(*line, head, 1) == 0)
 			return (0);
@@ -55,23 +77,23 @@ int		startline_if(int fd, char **line, t_check *check, t_map *head)
 	return (1);
 }
 
-int		write_room(int fd, char **line, t_map *head, t_check *check)
+int		write_room(char **line, t_map *head, t_check *check, t_print **print)
 {
 	char	*tmp;
 
 	tmp = *line;
 	if (ft_strncmp(*line, "##start", 8) == 0)
 	{
-		ft_printf("%s\n", *line);
+		add_line_toprint(print, *line);
 		free(tmp);
-		if (startline_if(fd, line, check, head) == 0)
+		if (startline_if(line, check, head, print) == 0)
 			return (0);
 	}
 	else if (ft_strncmp(*line, "##end", 6) == 0)
 	{
-		ft_printf("%s\n", *line);
+		add_line_toprint(print, *line);
 		free(tmp);
-		if (endline_if(fd, line, check, head) == 0)
+		if (endline_if(line, check, head, print) == 0)
 			return (0);
 	}
 	else if (check_add_room(*line, head, 0) == 0)

@@ -49,7 +49,8 @@ int		check_pipe(char *line, t_map *head)
 	if (line[0] == ' ' || line[0] == '-')
 		return (0);
 	split = ft_strsplit(line, '-');
-	if (check_same_room(split) == 0 || check_space(split) == 0)
+	if (check_same_room(split) == 0 ||
+		check_space(split) == 0)
 	{
 		free(split[0]);
 		free(split[1]);
@@ -108,6 +109,8 @@ int		check_line(char *line, t_check *check, t_map *head)
 	if ((line[0] == '#' && line[1] != '#') ||
 		(line[0] == '#' && line[1] == '#' && line[2] == '#'))
 		return (3);
+	if (line[0] == '#' && line[1] == '#')
+		return (4);
 	if (line[0] == '\0' || line[0] == ' ')
 		return (0);
 	return (check_bad_line(line, head));

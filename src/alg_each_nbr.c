@@ -62,6 +62,12 @@ void	stack_push(t_qeueu **stack, char *str, char *predecessor)
 	tmp->next = new;
 }
 
+int		if_not_end(t_used **used)
+{
+	free_used(*used);
+	return (0);
+}
+
 int		start_alg(char *end, t_room *start, t_rezult **rez, t_map *head)
 {
 	t_qeueu *stack;
@@ -83,19 +89,23 @@ int		start_alg(char *end, t_room *start, t_rezult **rez, t_map *head)
 		add_front_used(&used, stack);
 		pop_first_stack(&stack);
 	}
+	if (add_rezult(rez, used, end) == -1)
+		return (if_not_end(&used));
 	while (add_rezult(rez, used, end))
 		;
 	free_used(used);
 	return (1);
 }
 
-void	alg_each_nbr(char *end, t_map *head, t_rezult **rez, int num)
+int		alg_each_nbr(char *end, t_map *head, t_rezult **rez, int num)
 {
 	int		i;
+	int		count;
 	t_nbr	*tmp;
 	t_room	*tmproom;
 
 	i = 0;
+	count = 0;
 	tmp = head->allroom->headnbr;
 	tmproom = head->allroom;
 	while (i < num)
@@ -105,8 +115,10 @@ void	alg_each_nbr(char *end, t_map *head, t_rezult **rez, int num)
 	}
 	while (tmproom != NULL)
 	{
-		if (strcmp(tmproom->name, tmp->name) == 0)
-			start_alg(end, tmproom, rez, head);
+		if (ft_strcmp(tmproom->name, tmp->name) == 0)
+			if (!(start_alg(end, tmproom, rez, head)))
+				return (0);
 		tmproom = tmproom->nextroom;
 	}
+	return (1);
 }

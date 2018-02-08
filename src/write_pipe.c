@@ -12,10 +12,14 @@
 
 #include "lem_in.h"
 
-void	init_new_nbr(t_nbr *nbr, char *name)
+void	init_new_nbr(t_nbr *nbr, char *name, t_room *head, t_check *check)
 {
 	nbr->name = ft_strdup(name);
 	nbr->nextnbr = NULL;
+	if (head->flag == 1)
+		check->count_st_path++;
+	if (head->flag == 2)
+		check->count_end_path++;
 }
 
 int		add_nbr(t_room *head, char *name, t_check *check)
@@ -24,24 +28,23 @@ int		add_nbr(t_room *head, char *name, t_check *check)
 	t_nbr	*new_nbr;
 
 	tmp = head->headnbr;
-	if (head->flag == 1)
-		check->count_st_path++;
-	if (head->flag == 2)
-		check->count_end_path++;
-	new_nbr = (t_nbr*)malloc(sizeof(t_nbr));
-	init_new_nbr(new_nbr, name);
+	if (!(new_nbr = (t_nbr*)malloc(sizeof(t_nbr))))
+		return (0);
+	init_new_nbr(new_nbr, name, head, check);
 	if (tmp == NULL)
 	{
 		head->headnbr = new_nbr;
 		return (1);
 	}
 	while (tmp->nextnbr != NULL)
-		tmp = tmp->nextnbr;
-	if (ft_strcmp(tmp->name, new_nbr->name) == 0)
 	{
-		free(new_nbr->name);
-		free(new_nbr);
-		return (0);
+		if (ft_strcmp(tmp->name, new_nbr->name) == 0)
+		{
+			free(new_nbr->name);
+			free(new_nbr);
+			return (0);
+		}
+		tmp = tmp->nextnbr;
 	}
 	tmp->nextnbr = new_nbr;
 	return (1);
@@ -73,14 +76,22 @@ int		add_pipe(char **split, t_map *head, t_check *check)
 	return (1);
 }
 
-void	write_pipe(char *line, t_map *head, t_check *check)
+int		write_pipe(char *line, t_map *head, t_check *check)
 {
 	char **split;
 
 	split = ft_strsplit(line, '-');
 	if (add_pipe(split, head, check))
 		check->pipe++;
+	else
+	{
+		free(split[0]);
+		free(split[1]);
+		free(split);
+		return (0);
+	}
 	free(split[0]);
 	free(split[1]);
 	free(split);
+	return (1);
 }
