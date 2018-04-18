@@ -1,5 +1,7 @@
 # Lem_in
 
+The goal of this project is to find the quickest way to get n ants across the farm
+
 HOW IT WORKS
 
 1. Compile all files (jus print make at the root of repository) it is create binary file "lem-in"
@@ -44,8 +46,6 @@ in an unexpected manner (Segmentation fault, bus error, double free, etc).
 ◦ perror
 
 --------------------------------------------------------------------------------------
-
-• The goal of this project is to find the quickest way to get n ants across the farm.
 
 • Obviously, there are some basic constraints. To be the first to arrive, ants will need to take the shortest path (and that isn’t necessarily the simplest). 
 They will also need to avoid traffic jams as well as walking all over their fellow ants.
