@@ -7,6 +7,8 @@ HOW IT WORKS
 1. Compile all files (jus print make at the root of repository) it is create binary file "lem-in"
 2. Then type, for example [./lem-in < lem-in_maps/100_map_0]. You can chose different map from (lem-in_maps) directory.
 
+![](https://github.com/tt1m0n/Lem_in/blob/master/Lemin_1.gif)
+
 -----------------------------------------------------------------------------------------------------------
 
 • This project will only be corrected by actual human beings. You are therefore free to organize and name your files as you wish, 
