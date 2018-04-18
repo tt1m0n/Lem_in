@@ -52,9 +52,9 @@ They will also need to avoid traffic jams as well as walking all over their fell
 
 • At the beginning of the game, all the ants are in the room ##start. The goal is to bring them to the room ##end with as few turns as possible. 
 
-Each room can only contain one ant at a time. (except at ##start and ##end which can contain as many ants as necessary.)
-• We consider that all the ants are in the room ##start at the beginning of the game.
+• Each room can only contain one ant at a time. (except at ##start and ##end which can contain as many ants as necessary.)
 
+• We consider that all the ants are in the room ##start at the beginning of the game.
 
 • At each turn you will only display the ants that moved.
 
