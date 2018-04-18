@@ -6,7 +6,7 @@
 #    By: omakovsk <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2017/10/26 18:09:32 by omakovsk          #+#    #+#              #
-#    Updated: 2018/01/27 19:40:12 by omakovsk         ###   ########.fr        #
+#    Updated: 2018/04/18 15:45:38 by omakovsk         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,7 +45,7 @@ OBJ	= $(SRC:.c=.o)
 all: $(addprefix ../objects/,$(OBJ))
 
 ../objects/%.o: %.c
-	@gcc $(FLAGS) $< -o $@
+	gcc $(FLAGS) $< -o $@
 
 clean:
 	@rm -f $(OBJ)
